@@ -52,6 +52,14 @@ module RidleyExec
           options[:knife_path] = path
         end
 
+        opts.on('-e [SCRIPT_STRING]', String, 'Execute the ruby in SCRIPT_STRING') do |script|
+          options[:target] = prepare_script_string(script)
+        end
+
+        opts.on('-I', 'Execute the ruby from STDIN.') do
+          options[:target] = prepare_stdin_script
+        end
+
         opts.separator ""
         opts.separator "Common options:"
         opts.on_tail("-h", "--help", "Show this help message.") do
@@ -80,18 +88,44 @@ module RidleyExec
     end
 
 
+    def self.prepare_script(path)
+      Proc.new do |scope|
+        eval File.read(path), scope, path
+      end
+    end
+
+    def self.prepare_stdin_script
+      Proc.new do |scope|
+        eval STDIN.read, scope, '-stdin-'
+      end
+    end
+
+    def self.prepare_script_string(script)
+      Proc.new do |scope|
+        eval script, scope, '-'
+      end
+    end
+
     def self.resolve_args(args)
       options, remaining = parse_args(args)
       options = options.inject({}) do |a, kv|
         a[kv[0]] = kv[1] unless kv[1].nil?
         a
       end
+
+      if options.has_key? :target
+        target = options.delete(:target)
+      else
+        target = prepare_script(remaining.shift)
+      end
+
       if options.has_key? :knife_path
         api = api_from_knife(options[:knife_path])
       else
         api = api_from_options(options)
       end
-      [options, remaining]
+
+      [api, target, remaining]
     end
   end
 end
