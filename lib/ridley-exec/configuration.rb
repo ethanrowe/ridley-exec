@@ -60,6 +60,10 @@ module RidleyExec
           options[:target] = prepare_stdin_script
         end
 
+        opts.on('--pry', 'Run pry REPL with api in context') do
+          options[:target] = prepare_pry_session
+        end
+
         opts.separator ""
         opts.separator "Common options:"
         opts.on_tail("-h", "--help", "Show this help message.") do
@@ -103,6 +107,13 @@ module RidleyExec
     def self.prepare_script_string(script)
       Proc.new do |scope|
         eval script, scope, '-'
+      end
+    end
+
+    def self.prepare_pry_session
+      Proc.new do |scope|
+        require "pry"
+        scope.pry
       end
     end
 

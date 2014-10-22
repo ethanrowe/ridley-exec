@@ -10,9 +10,12 @@ Gem::Specification.new do |s|
   s.summary    = 'Basic utility for executing ruby scripts with ridley chef API in scope'
   s.description  = s.summary
 
-  s.add_dependency 'ridley', '>= 4.0'
-  s.files = `git ls-files`.split("\n")
+  s.add_dependency 'ridley', '~> 4.0'
+  s.add_dependency 'pry', '~> 0.10'
+
+  s.files = `git ls-files`.split("\n").reject {|n| ["Gemfile", "Gemfile.lock"].include? n}
   s.executables = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+
   s.require_paths = ['lib']
 end
 
