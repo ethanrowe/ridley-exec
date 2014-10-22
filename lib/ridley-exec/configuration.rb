@@ -46,7 +46,6 @@ module RidleyExec
         end
 
         options[:knife_path] = env_default(:CHEF_KNIFE_PATH, nil)
-        puts "Knife path nil? #{options[:knife_path].nil?}"
         opts.on('-p [KNIFE_PATH]', '--knife-path [KNIFE_PATH]', String, "Path to the knife.rb file to use for config (empty string does search)") do |path|
           path = '' if path.nil?
           options[:knife_path] = path
