@@ -77,8 +77,10 @@ module RidleyExec
         end
       end
 
-      opt_parser.parse!(args)
-      [options, args]
+      # Stops on first non-option param
+      non_param = []
+      args = opt_parser.order(args) {|p| non_param << p; opt_parser.terminate}
+      [options, non_param + args]
     end
 
     def self.api_from_knife(path)
